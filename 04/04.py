@@ -102,7 +102,9 @@ def is_hgt_valid(passport):
     logging.debug(f'hgt - {hgt}')
     if hgt == None:
         return False
-    elif (int(hgt[0]) >= 150 and int(hgt[0]) <= 193 and hgt[1] == 'cm') or (int(hgt[0]) >= 59 and int(hgt[0]) <= 76 and hgt[1] == 'in'):
+    elif int(hgt[0]) >= 150 and int(hgt[0]) <= 193 and hgt[1] == 'cm':
+        return True
+    elif int(hgt[0]) >= 59 and int(hgt[0]) <= 76 and hgt[1] == 'in':
         return True
     else:
         return False
@@ -145,6 +147,6 @@ def is_pid_valid(passport):
 valid_passports = 0
 
 for passport in passport_data:
-    if validate_passport(passport, f=1):
+    if validate_passport(passport, f=2):
         valid_passports += 1
 print(valid_passports)
