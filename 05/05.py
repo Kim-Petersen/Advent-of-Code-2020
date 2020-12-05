@@ -41,7 +41,7 @@ print(f'Sanity check: {max(seat_ids)}')
 def missing_seat(list_of_seats):
     list_of_seats = sorted(list_of_seats)
     start, end = list_of_seats[0], list_of_seats[-1]
-    return sorted(set(range(start, end + 1)).difference(list_of_seats))
+    return set(range(start, end + 1)).difference(list_of_seats)
 
 
 print(f'My seat: {missing_seat(seat_ids)}')
