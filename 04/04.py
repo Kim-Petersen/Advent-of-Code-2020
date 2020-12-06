@@ -56,7 +56,7 @@ def has_valid_hgt(d):
 
 def has_valid_hcl(d):
     hcl = d['hcl']
-    if re.search('#[0-9a-f]{6}', hcl):
+    if re.search('#[0-9a-f]{6}$', hcl):
         return True
     else:
         return False
