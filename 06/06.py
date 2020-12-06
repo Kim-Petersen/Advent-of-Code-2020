@@ -13,4 +13,3 @@ customs_declaration_2 = [(x.split('\n')) for x in customs_declaration]
 customs_declaration_2 = [[set(x) for x in y] for y in customs_declaration_2]
 customs_declaration_2 = [set.intersection(*x) for x in customs_declaration_2]
 print(sum(map(len, customs_declaration_2)))
-
