@@ -69,7 +69,7 @@ def has_valid_ecl(d):
 
 def has_valid_pid(d):
     pid = d['pid']
-    if re.search('[0-9]{9}', pid):
+    if re.search('^[0-9]{9}$', pid):
         return True
     else:
         return False
