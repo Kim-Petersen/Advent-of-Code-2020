@@ -1,152 +1,101 @@
 import re
-import logging
-
-logging.basicConfig(level=logging.INFO)
 
 with open('./passport data.txt') as f:
     passport_data = f.read()
 
 passport_data = passport_data.split('\n\n')
+passport_data = [x.replace('\n', ' ') for x in passport_data]
 
-for index, passport in enumerate(passport_data):
-    passport_data[index] = passport.replace('\n', ' ')
+passport_dicts = [dict(s.split(':', 1) for s in passport.split(' ') if ':' in s) for passport in passport_data]
 
 
-def validate_passport(passport, f=1):
-    logging.debug(passport)
+def passport_has_required_keys(d):
+    required_keys = ['byr', 'iyr', 'eyr', 'hgt', 'hcl', 'ecl', 'pid']
+    for i in required_keys:
+        if i in d:
+            pass
+        else:
+            return False
+    return True
 
-    has_byr = 'byr' in passport
-    has_iyr = 'iyr' in passport
-    has_eyr = 'eyr' in passport
-    has_hgt = 'hgt' in passport
-    has_hcl = 'hcl' in passport
-    has_ecl = 'ecl' in passport
-    has_pid = 'pid' in passport
-    has_cid = 'cid' in passport
 
-    if has_byr and has_iyr and has_eyr and has_hgt and has_hcl and has_ecl and has_pid:
-        if f == 1:
-            return True
-        elif f == 2:
-            byr_valid = is_byr_valid(passport)
-            logging.debug(f'byr valid - {byr_valid}')
-            iyr_valid = is_iyr_valid(passport)
-            logging.debug(f'iyr valid - {iyr_valid}')
-            eyr_valid = is_eyr_valid(passport)
-            logging.debug(f'eyr valid - {eyr_valid}')
-            hgt_valid = is_hgt_valid(passport)
-            logging.debug(f'hgt valid - {hgt_valid}')
-            hcl_valid = is_hcl_valid(passport)
-            logging.debug(f'hcl valid - {hcl_valid}')
-            ecl_valid = is_ecl_valid(passport)
-            logging.debug(f'ecl valid - {ecl_valid}')
-            pid_valid = is_pid_valid(passport)
-            logging.debug(f'pid valid - {pid_valid}')
-            if byr_valid and iyr_valid and eyr_valid and hgt_valid and hcl_valid and ecl_valid and pid_valid:
-                logging.debug('Passport valid')
-                return True
-            else:
-                logging.debug('Passport invalid')
-                return False
+passports_req_keys = list(filter(passport_has_required_keys, passport_dicts))
+
+print(len(passports_req_keys))
+
+
+def has_valid_byr(d):
+    byr = int(d['byr'])
+    if byr >= 1920 and byr <= 2002:
+        return True
     else:
         return False
 
 
-def is_byr_valid(passport):
+def has_valid_iyr(d):
+    iyr = int(d['iyr'])
+    if iyr >= 2010 and iyr <= 2020:
+        return True
+    else:
+        return False
+
+
+def has_valid_eyr(d):
+    eyr = int(d['eyr'])
+    if eyr >= 2020 and eyr <= 2030:
+        return True
+    else:
+        return False
+
+
+def has_valid_hgt(d):
+    hgt_s = d['hgt']
     try:
-        byr = int(re.search('(byr):(\d{4})', passport).group(2))
-    except:
-        byr = None
-    logging.debug(f'byr - {byr}')
-    if byr == None:
+        hgt, unit = re.search('([0-9]+)(cm|in)', hgt_s).groups()
+        hgt = int(hgt)
+    except AttributeError:
         return False
-    elif byr >= 1920 and byr <= 2002:
+    if unit == 'cm' and hgt >= 150 and hgt <= 193:
+        return True
+    elif unit == 'in' and hgt >= 59 and hgt <= 76:
         return True
     else:
         return False
 
 
-def is_iyr_valid(passport):
-    try:
-        iyr = int(re.search('(iyr):(\d{4})', passport).group(2))
-    except:
-        iyr = None
-    logging.debug(f'iyr - {iyr}')
-    if iyr == None:
-        return False
-    elif iyr >= 2010 and iyr <= 2020:
+def has_valid_hcl(d):
+    hcl = d['hcl']
+    if re.search('#[0-9a-fA-F]{6}', hcl):
         return True
     else:
         return False
 
 
-def is_eyr_valid(passport):
-    try:
-        eyr = int(re.search('(eyr):(\d{4})', passport).group(2))
-    except:
-        eyr = None
-    logging.debug(f'eyr - {eyr}')
-    if eyr == None:
-        return False
-    elif eyr >= 2020 and eyr <= 2030:
+def has_valid_ecl(d):
+    ecl = d['ecl']
+    if re.search('amb|blu|brn|gry|grn|hzl|oth', ecl):
         return True
     else:
         return False
 
 
-def is_hgt_valid(passport):
-    try:
-        hgt = re.search('(hgt):(\d{3}|\d{2})(cm|in)?', passport).groups()[1:]
-    except:
-        hgt = None
-    logging.debug(f'hgt - {hgt}')
-    if hgt == None:
-        return False
-    elif int(hgt[0]) >= 150 and int(hgt[0]) <= 193 and hgt[1] == 'cm':
-        return True
-    elif int(hgt[0]) >= 59 and int(hgt[0]) <= 76 and hgt[1] == 'in':
+def has_valid_pid(d):
+    pid = d['pid']
+    if re.search('0*\d{9}', pid):
         return True
     else:
         return False
 
 
-def is_hcl_valid(passport):
-    try:
-        hcl = re.search('(hcl):(#[0-9a-f]{6})', passport).group(2)
-    except:
-        hcl = None
-    logging.debug(f'hcl - {hcl}')
-    if hcl:
-        return True
-    else:
-        return False
+def passport_has_valid_values(d):
+    validity_checks = [has_valid_byr,
+                       has_valid_iyr,
+                       has_valid_eyr,
+                       has_valid_hgt,
+                       has_valid_hcl,
+                       has_valid_ecl,
+                       has_valid_pid]
+    return all([f(d) for f in validity_checks])
 
 
-def is_ecl_valid(passport):
-    try:
-        ecl = re.search('(ecl):(amb|blu|brn|gry|grn|hzl|oth)', passport).group(2)
-    except:
-        ecl = None
-    logging.debug(f'ecl - {ecl}')
-    if ecl:
-        return True
-    else:
-        return False
-
-def is_pid_valid(passport):
-    try:
-        pid = re.search('(pid):(\d{9})', passport).group(2)
-    except:
-        pid = None
-    logging.debug(f'pid - {pid}')
-    if pid:
-        return True
-    else:
-        return False
-
-valid_passports = 0
-
-for passport in passport_data:
-    if validate_passport(passport, f=2):
-        valid_passports += 1
-print(valid_passports)
+len(list(filter(passport_has_valid_values, passports_req_keys)))
