@@ -26,26 +26,17 @@ print(len(passports_req_keys))
 
 def has_valid_byr(d):
     byr = int(d['byr'])
-    if byr >= 1920 and byr <= 2002:
-        return True
-    else:
-        return False
+    return byr >= 1920 and byr <= 2002
 
 
 def has_valid_iyr(d):
     iyr = int(d['iyr'])
-    if iyr >= 2010 and iyr <= 2020:
-        return True
-    else:
-        return False
+    return iyr >= 2010 and iyr <= 2020
 
 
 def has_valid_eyr(d):
     eyr = int(d['eyr'])
-    if eyr >= 2020 and eyr <= 2030:
-        return True
-    else:
-        return False
+    return eyr >= 2020 and eyr <= 2030
 
 
 def has_valid_hgt(d):
@@ -65,7 +56,7 @@ def has_valid_hgt(d):
 
 def has_valid_hcl(d):
     hcl = d['hcl']
-    if re.search('#[0-9a-fA-F]{6}', hcl):
+    if re.search('#[0-9a-f]{6}', hcl):
         return True
     else:
         return False
@@ -73,15 +64,12 @@ def has_valid_hcl(d):
 
 def has_valid_ecl(d):
     ecl = d['ecl']
-    if re.search('amb|blu|brn|gry|grn|hzl|oth', ecl):
-        return True
-    else:
-        return False
+    return ecl in ['amb', 'blu', 'brn', 'gry', 'grn', 'hzl', 'oth']
 
 
 def has_valid_pid(d):
     pid = d['pid']
-    if re.search('\d{9}', pid):
+    if re.search('[0-9]{9}', pid):
         return True
     else:
         return False
@@ -95,7 +83,8 @@ def passport_has_valid_values(d):
                        has_valid_hcl,
                        has_valid_ecl,
                        has_valid_pid]
+
     return all([f(d) for f in validity_checks])
 
 
-len(list(filter(passport_has_valid_values, passports_req_keys)))
+print(len(list(filter(passport_has_valid_values, passports_req_keys))))
